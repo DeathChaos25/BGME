@@ -1,25 +1,20 @@
 ﻿using BGME.Framework.Music;
-using Reloaded.Hooks.Definitions;
-using Reloaded.Memory.SigScan.ReloadedII.Interfaces;
 
 namespace BGME.Framework.Metaphor;
 
 internal class BgmeService : IBgmeService
 {
-    private readonly EncounterBgm encounterBgm;
+    private readonly BgmService _bgm;
+    private readonly EncounterBgm _encounterBgm;
 
     public BgmeService(MusicService music)
     {
-        this.encounterBgm = new(music);
-    }
-
-    public void Initialize(IStartupScanner scanner, IReloadedHooks hooks)
-    {
-        this.encounterBgm.Initialize(scanner, hooks);
+        _bgm = new(music);
+        //_encounterBgm = new(music);
     }
 
     public void SetVictoryDisabled(bool isDisabled)
     {
-        this.encounterBgm.SetVictoryDisabled(isDisabled);
+        //_encounterBgm.SetVictoryDisabled(isDisabled);
     }
 }

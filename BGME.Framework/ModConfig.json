@@ -2,7 +2,7 @@
   "ModId": "BGME.Framework",
   "ModName": "BGME Framework",
   "ModAuthor": "RyoTune",
-  "ModVersion": "3.5.0",
+  "ModVersion": "4.0.0",
   "ModDescription": "Extends BGM functionality in Persona games.",
   "ModDll": "BGME.Framework.dll",
   "ModIcon": "Preview.png",
@@ -18,15 +18,6 @@
   "PluginData": {
     "GitHubDependencies": {
       "IdToConfigMap": {
-        "p5rpc.modloader": {
-          "Config": {
-            "UserName": "Sewer56",
-            "RepositoryName": "p5rpc.modloader",
-            "UseReleaseTag": true,
-            "AssetFileName": "Mod.zip"
-          },
-          "ReleaseMetadataName": "p5rpc.modloader.ReleaseMetadata.json"
-        },
         "Reloaded.Memory.SigScan.ReloadedII": {
           "Config": {
             "UserName": "Reloaded-Project",
@@ -160,7 +151,6 @@
   },
   "IsUniversalMod": false,
   "ModDependencies": [
-    "p5rpc.modloader",
     "Reloaded.Memory.SigScan.ReloadedII",
     "reloaded.sharedlib.hooks",
     "crifs.v2.hook",
