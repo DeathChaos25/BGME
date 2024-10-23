@@ -33,7 +33,7 @@ env:
   PUBLISH_GAMEBANANA_FRAMEWORK_API_PATH: ./Publish/ToUpload/Framework.API/GameBanana
   PUBLISH_GITHUB_FRAMEWORK_API_PATH: ./Publish/ToUpload/Framework.API/Generic
 
-  INTEFACES_NAME: BGME.Framework.Interfaces
+  INTERFACES_NAME: BGME.Framework.Interfaces
   
   PUBLISH_CHANGELOG_PATH: ./Publish/Changelog.md
   PUBLISH_PATH: ./Publish
