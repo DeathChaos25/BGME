@@ -18,5 +18,12 @@
   <ItemGroup>
     <ProjectReference Include="..\PersonaMusicScript.Types\PersonaMusicScript.Types.csproj" />
   </ItemGroup>
-	
+    
+  <ItemGroup>
+    <Content Include="Data\**" Link="%(RecursiveDir)\%(Filename)%(Extension)">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+  </ItemGroup>
+  
 </Project>
