@@ -4,7 +4,6 @@ using BGME.Framework.P5R.Rhythm;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Hooks.Definitions.Enums;
 using Reloaded.Hooks.Definitions.X64;
-using Reloaded.Memory.SigScan.ReloadedII.Interfaces;
 using static Reloaded.Hooks.Definitions.X64.FunctionAttribute;
 
 namespace BGME.Framework.P5R;

@@ -1,7 +1,6 @@
 ﻿using BGME.Framework.Music;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Hooks.Definitions.X64;
-using Reloaded.Memory.SigScan.ReloadedII.Interfaces;
 using Timer = System.Timers.Timer;
 
 namespace BGME.Framework.P5R;

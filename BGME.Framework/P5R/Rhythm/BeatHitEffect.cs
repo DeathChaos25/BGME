@@ -1,7 +1,6 @@
 ﻿using p5rpc.lib.interfaces;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Hooks.Definitions.X64;
-using Reloaded.Memory.SigScan.ReloadedII.Interfaces;
 using System.Runtime.InteropServices;
 using static Reloaded.Hooks.Definitions.X64.FunctionAttribute;
 

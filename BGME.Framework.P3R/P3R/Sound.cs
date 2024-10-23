@@ -1,10 +1,8 @@
 ﻿using BGME.Framework.Music;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Hooks.Definitions.X64;
-using Reloaded.Memory.SigScan.ReloadedII.Interfaces;
 using Ryo.Definitions.Structs;
 using Ryo.Interfaces;
-using YamlDotNet.Core;
 
 namespace BGME.Framework.P3R.P3R;
 

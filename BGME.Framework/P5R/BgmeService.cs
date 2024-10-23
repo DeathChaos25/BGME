@@ -1,8 +1,6 @@
 ﻿using BGME.Framework.Music;
 using BGME.Framework.P5R.Rhythm;
 using p5rpc.lib.interfaces;
-using Reloaded.Hooks.Definitions;
-using Reloaded.Memory.SigScan.ReloadedII.Interfaces;
 
 namespace BGME.Framework.P5R;
 

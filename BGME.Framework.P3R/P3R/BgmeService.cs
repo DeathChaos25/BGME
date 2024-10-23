@@ -1,6 +1,4 @@
 ﻿using BGME.Framework.Music;
-using Reloaded.Hooks.Definitions;
-using Reloaded.Memory.SigScan.ReloadedII.Interfaces;
 using Ryo.Interfaces;
 
 namespace BGME.Framework.P3R.P3R;
