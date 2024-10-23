@@ -32,6 +32,8 @@ env:
 
   PUBLISH_GAMEBANANA_FRAMEWORK_API_PATH: ./Publish/ToUpload/Framework.API/GameBanana
   PUBLISH_GITHUB_FRAMEWORK_API_PATH: ./Publish/ToUpload/Framework.API/Generic
+
+  INTEFACES_NAME: BGME.Framework.Interfaces
   
   PUBLISH_CHANGELOG_PATH: ./Publish/Changelog.md
   PUBLISH_PATH: ./Publish
@@ -86,8 +88,12 @@ jobs:
     - name: Build
       run: ./PublishAll.ps1
 
-#    - name: Copy Build
-#      run: Copy-Item -Force -Path "${{ env.PROJECT_DIR }}/Publish/*" -Destination "./Publish" -Recurse
+    - name: Build Interfaces
+      run: dotnet pack ${{ env.INTERFACES_NAME }} -c Release --output .
+
+    - name: Push Interfaces to Nuget
+      if: env.IS_RELEASE == 'true'
+      run: dotnet nuget push "*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
     - name: Upload GitHub Release Artifact
       uses: actions/upload-artifact@v4
