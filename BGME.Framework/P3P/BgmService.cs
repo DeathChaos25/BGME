@@ -2,7 +2,6 @@
 using Reloaded.Hooks.Definitions;
 using Reloaded.Hooks.Definitions.Enums;
 using Reloaded.Hooks.Definitions.X64;
-using Reloaded.Memory.SigScan.ReloadedII.Interfaces;
 using Ryo.Definitions.Structs;
 using Ryo.Interfaces;
 using System.Runtime.InteropServices;
@@ -14,7 +13,7 @@ namespace BGME.Framework.P3P;
 /// <summary>
 /// Patch BGM function to play any BGM audio file.
 /// </summary>
-internal unsafe class Sound : BaseSound
+internal unsafe class BgmService : BaseBgm
 {
     private const int MAX_STRING_SIZE = 16;
 
@@ -32,9 +31,7 @@ internal unsafe class Sound : BaseSound
     private readonly ICriAtomRegistry criAtomRegistry;
     private readonly byte* bgmStringBuffer;
 
-    public Sound(
-        IReloadedHooks hooks,
-        IStartupScanner scanner,
+    public BgmService(
         IRyoApi ryo,
         ICriAtomEx criAtomEx,
         ICriAtomRegistry criAtomRegistry,
@@ -46,32 +43,32 @@ internal unsafe class Sound : BaseSound
         this.criAtomRegistry = criAtomRegistry;
         this.bgmStringBuffer = (byte*)NativeMemory.AllocZeroed(MAX_STRING_SIZE, sizeof(byte));
 
-        scanner.Scan("BGM Patch", "4E 8B 84 ?? ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B 0D", address =>
-        {
-            var bgmPatch = new string[]
+        ScanHooks.Add(
+            "BGM Patch",
+            "4E 8B 84 ?? ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B 0D",
+            (hooks, result) =>
             {
-                "use64",
-                $"{Utilities.PushCallerRegisters}",
-                $"{hooks.Utilities.GetAbsoluteCallMnemonics(this.GetBgmStringImpl, out this.bgmReverseWrapper)}",
-                $"{Utilities.PopCallerRegisters}",
-                $"mov r8, rax",
-            };
+                var bgmPatch = new string[]
+                {
+                    "use64",
+                    Utilities.PushCallerRegisters,
+                    hooks.Utilities.GetAbsoluteCallMnemonics(this.GetBgmStringImpl, out this.bgmReverseWrapper),
+                    Utilities.PopCallerRegisters,
+                    $"mov r8, rax",
+                };
 
-            this.bgmHook = hooks.CreateAsmHook(bgmPatch, address, AsmHookBehaviour.DoNotExecuteOriginal).Activate();
-        });
-
-        scanner.Scan(
-            "Fix BGM Crashes",
-            "8B 0D ?? ?? ?? ?? BB 01 00 00 00 89 DA E8 ?? ?? ?? ?? 66 44 8B 05",
-            result =>
-            {
-                this.fixBgmCrashHook = hooks.CreateAsmHook(new[] { "use64", "xor ecx, ecx" }, result + 0x7C, AsmHookBehaviour.DoNotExecuteOriginal).Activate();
+                this.bgmHook = hooks.CreateAsmHook(bgmPatch, result, AsmHookBehaviour.DoNotExecuteOriginal).Activate();
             });
 
-        scanner.Scan(nameof(PlayComseOrBse), "40 53 55 56 57 41 54 41 57 48 81 EC B8 00 00 00", result =>
-        {
-            this.playComseOrBseHook = hooks.CreateHook<PlayComseOrBse>(this.PlayComseOrBseImpl, result).Activate();
-        });
+        ScanHooks.Add(
+            "Fix BGM Crashes",
+            "8B 0D ?? ?? ?? ?? BB 01 00 00 00 89 DA E8 ?? ?? ?? ?? 66 44 8B 05",
+            (hooks, result) => this.fixBgmCrashHook = hooks.CreateAsmHook(new[] { "use64", "xor ecx, ecx" }, result + 0x7C, AsmHookBehaviour.DoNotExecuteOriginal).Activate());
+
+        ScanHooks.Add(
+            nameof(PlayComseOrBse),
+            "40 53 55 56 57 41 54 41 57 48 81 EC B8 00 00 00",
+            (hooks, result) => this.playComseOrBseHook = hooks.CreateHook<PlayComseOrBse>(this.PlayComseOrBseImpl, result).Activate());
     }
 
     private nint _customSePlayer = IntPtr.Zero;

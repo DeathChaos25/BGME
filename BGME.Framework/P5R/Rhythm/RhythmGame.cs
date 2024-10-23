@@ -5,7 +5,7 @@ namespace BGME.Framework.P5R.Rhythm;
 internal class RhythmGame
 {
     private readonly IP5RLib p5rLib;
-    private readonly BgmPlayback bgm;
+    private readonly BgmService bgm;
     private readonly EffectsHook effectsHook;
 
     private uint initialPlaybackId;
@@ -23,7 +23,7 @@ internal class RhythmGame
     public RhythmGame(
         IP5RLib p5rLib,
         //CriAtomEx criAtomEx,
-        BgmPlayback bgm,
+        BgmService bgm,
         BeatHitEffect beatHitEffect)
     {
         this.p5rLib = p5rLib;

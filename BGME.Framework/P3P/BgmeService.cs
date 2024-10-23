@@ -7,21 +7,19 @@ namespace BGME.Framework.P3P;
 
 internal class BgmeService : IBgmeService
 {
-    private readonly Sound soundPatcher;
+    private readonly BgmService soundPatcher;
     private readonly EncounterBgm encounterPatcher;
     private readonly FloorBgm floorBgm;
 
     public BgmeService(
-        IReloadedHooks hooks,
-        IStartupScanner scanner,
         IRyoApi ryo,
         ICriAtomEx criAtomEx,
         ICriAtomRegistry criAtomRegistry,
         MusicService music)
     {
-        this.soundPatcher = new(hooks, scanner, ryo, criAtomEx, criAtomRegistry, music);
-        this.encounterPatcher = new(hooks, scanner, music);
-        this.floorBgm = new(hooks, scanner, music);
+        this.soundPatcher = new(ryo, criAtomEx, criAtomRegistry, music);
+        this.encounterPatcher = new(music);
+        this.floorBgm = new(music);
     }
 
     public void Initialize(IStartupScanner scanner, IReloadedHooks hooks)

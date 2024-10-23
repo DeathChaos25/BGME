@@ -57,7 +57,6 @@ public class Mod : ModBase
         var appId = this.modLoader.GetAppConfig().AppId;
         this.game = GetGame(this.modLoader.GetAppConfig().AppId);
 
-        this.modLoader.GetController<IStartupScanner>().TryGetTarget(out var scanner);
         this.modLoader.GetController<ICriFsRedirectorApi>().TryGetTarget(out this.criFsApi!);
         this.modLoader.GetController<IRyoApi>().TryGetTarget(out this.ryo!);
         this.modLoader.GetController<ICriAtomEx>().TryGetTarget(out var criAtomEx);
@@ -89,7 +88,7 @@ public class Mod : ModBase
                 this.bgme = new P4G.BgmeService(scans!, criAtomRegistry!, this.music);
                 break;
             case Game.P3P_PC:
-                this.bgme = new P3P.BgmeService(this.hooks, scanner!, this.ryo, criAtomEx!, criAtomRegistry!, this.music);
+                this.bgme = new P3P.BgmeService(this.ryo, criAtomEx!, criAtomRegistry!, this.music);
                 break;
             case Game.Metaphor:
                 this.bgme = new Metaphor.BgmeService(this.music);

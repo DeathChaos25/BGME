@@ -5,7 +5,7 @@ using Timer = System.Timers.Timer;
 
 namespace BGME.Framework.P5R;
 
-internal unsafe class BgmPlayback : BaseSound
+internal unsafe class BgmService : BaseBgm
 {
     [Function(CallingConventions.Microsoft)]
     public delegate void PlayBgmCue(nint param1, nint param2, int bgmId, nint param4, nint param5);
@@ -18,7 +18,7 @@ internal unsafe class BgmPlayback : BaseSound
     private readonly Timer holdupBgmBuffer = new(TimeSpan.FromMilliseconds(1000)) { AutoReset = false };
     private bool holdupBgmQueued;
 
-    public BgmPlayback(MusicService music)
+    public BgmService(MusicService music)
         : base(music)
     {
         this.holdupBgmBuffer.Elapsed += (sender, args) =>

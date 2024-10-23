@@ -8,7 +8,7 @@ internal class BgmeService : IBgmeService
 {
     private readonly MusicService music;
 
-    private readonly Sound sound;
+    private readonly BgmService sound;
     private readonly EncounterBgm encounterPatcher;
     private readonly FloorBgm floorPatcher;
     private readonly EventBgm eventBgm;

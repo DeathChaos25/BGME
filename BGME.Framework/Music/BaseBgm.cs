@@ -2,7 +2,7 @@
 
 namespace BGME.Framework.Music;
 
-public abstract class BaseSound
+public abstract class BaseBgm
 {
     private readonly MusicService music;
 
@@ -10,7 +10,7 @@ public abstract class BaseSound
     private int? currentBgmId;
     private bool isVictoryDisabled;
 
-    public BaseSound(MusicService music)
+    public BaseBgm(MusicService music)
     {
         this.music = music;
     }

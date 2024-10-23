@@ -6,7 +6,7 @@ using Ryo.Interfaces;
 
 namespace BGME.Framework.P3R.P3R;
 
-internal unsafe class Sound : BaseSound
+internal unsafe class BgmService : BaseBgm
 {
     [Function(CallingConventions.Microsoft)]
     private delegate void PlayBgmFunction(int bgmId);
@@ -18,7 +18,7 @@ internal unsafe class Sound : BaseSound
     private readonly ICriAtomEx criAtomEx;
     private IHook<RequestSound>? requestSoundHook;
 
-    public Sound(ICriAtomEx criAtomEx, MusicService music)
+    public BgmService(ICriAtomEx criAtomEx, MusicService music)
         : base(music)
     {
         this.criAtomEx = criAtomEx;

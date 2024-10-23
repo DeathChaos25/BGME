@@ -7,7 +7,7 @@ namespace BGME.Framework.P5R;
 internal class BgmeService : IBgmeService
 {
     private readonly IP5RLib p5rLib;
-    private readonly BgmPlayback bgm;
+    private readonly BgmService bgm;
     private readonly EncounterBgm encounterBgm;
 
     private readonly RhythmGame? rhythmGame;

@@ -7,7 +7,7 @@ using static Ryo.Definitions.Functions.CriAtomExFunctions;
 
 namespace BGME.Framework.P4G;
 
-internal unsafe class Sound : BaseSound
+internal unsafe class BgmService : BaseBgm
 {
     private const double BATTLE_SFX_LIMIT_MS = 200;
 
@@ -26,7 +26,7 @@ internal unsafe class Sound : BaseSound
     private readonly ICriAtomRegistry criAtomRegistry;
     private readonly HookContainer<criAtomConfig_GetCategoryIndexById> getCategoryInfoByIndex;
 
-    public Sound(ISharedScans scans, ICriAtomRegistry criAtomRegistry, MusicService music)
+    public BgmService(ISharedScans scans, ICriAtomRegistry criAtomRegistry, MusicService music)
         : base(music)
     {
         this.criAtomRegistry = criAtomRegistry;
