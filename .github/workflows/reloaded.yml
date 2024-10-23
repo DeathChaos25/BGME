@@ -71,6 +71,13 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: '14'
+
+    - name: Build Interfaces
+      run: dotnet pack ${{ env.INTERFACES_NAME }} -c Release --output .
+
+    - name: Push Interfaces to Nuget
+      if: env.IS_RELEASE == 'true'
+      run: dotnet nuget push "*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
         
     - name: Setup AutoChangelog
       run: npm install -g auto-changelog
@@ -87,13 +94,6 @@ jobs:
         
     - name: Build
       run: ./PublishAll.ps1
-
-    - name: Build Interfaces
-      run: dotnet pack ${{ env.INTERFACES_NAME }} -c Release --output .
-
-    - name: Push Interfaces to Nuget
-      if: env.IS_RELEASE == 'true'
-      run: dotnet nuget push "*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
     - name: Upload GitHub Release Artifact
       uses: actions/upload-artifact@v4
