@@ -28,7 +28,7 @@ internal class BgmService : BaseBgm
         _playBgmHook!.OriginalFunction((int)currentBgmId);
     }
 
-    protected override int VictoryBgmId => 0;
+    protected override int VictoryBgmId => 1090;
 
     protected override void PlayBgm(int bgmId) => SndPlayBgmImpl(bgmId);
 }

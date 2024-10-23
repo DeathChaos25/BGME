@@ -10,11 +10,12 @@ internal class BgmeService : IBgmeService
     public BgmeService(MusicService music)
     {
         _bgm = new(music);
-        //_encounterBgm = new(music);
+        _encounterBgm = new(music);
     }
 
     public void SetVictoryDisabled(bool isDisabled)
     {
-        //_encounterBgm.SetVictoryDisabled(isDisabled);
+        _bgm.SetVictoryDisabled(isDisabled);
+        _encounterBgm.SetVictoryDisabled(isDisabled);
     }
 }
