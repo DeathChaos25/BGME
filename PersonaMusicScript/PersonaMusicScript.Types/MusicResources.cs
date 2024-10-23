@@ -1,5 +1,6 @@
 ﻿using PersonaMusicScript.Types.Games;
 using PersonaMusicScript.Types.Serializer;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace PersonaMusicScript.Types;
 
@@ -28,6 +29,11 @@ public class MusicResources
         {
             TotalEncounters = 1200,
         },
+
+        [Game.Metaphor] = new()
+        {
+            TotalEncounters = 2000,
+        },
     };
 
     private readonly Game game;
@@ -53,12 +59,12 @@ public class MusicResources
 
         if (game != Game.P3R_PC)
         {
-            this.cueAwbSet = this.gameMusic.Songs
+            this.cueAwbSet = this.gameMusic.Tracks
                 .Where(x => x.CueId != 0)
-                .ToDictionary(x => x.CueId, x => int.Parse(Path.GetFileNameWithoutExtension(x.ReplacementPath)!));
+                .ToDictionary(x => x.CueId, x => int.Parse(Path.GetFileNameWithoutExtension(x.OutputPath)!));
         }
 
-        var songCueIdData = this.gameMusic.Songs.ToDictionary(x => x.Name, y => y.CueId);
+        var songCueIdData = this.gameMusic.Tracks.ToDictionary(x => x.Name, y => y.CueId);
         this.Songs = new(songCueIdData, StringComparer.OrdinalIgnoreCase);
     }
 
@@ -80,11 +86,11 @@ public class MusicResources
         {
             Game.P5R_PC => (bgmId >= 10000)
             ? $"FEmulator/AWB/BGM_42.AWB/{awbIndex}.adx"
-            : $"{this.gameMusic.DefaultBaseReplacementPath}/{awbIndex}.adx",
+            : $"{this.gameMusic.DefaultOutputPath}/{awbIndex}.adx",
 
-            Game.P4G_PC => $"{this.gameMusic.DefaultBaseReplacementPath}/{awbIndex}.hca",
+            Game.P4G_PC => $"{this.gameMusic.DefaultOutputPath}/{awbIndex}.hca",
 
-            Game.P3P_PC => $"{this.gameMusic.DefaultBaseReplacementPath}/{awbIndex}.adx",
+            Game.P3P_PC => $"{this.gameMusic.DefaultOutputPath}/{awbIndex}.adx",
             _ => throw new Exception("Unknown game."),
         };
     }
@@ -92,7 +98,11 @@ public class MusicResources
     private GameMusic GetGameMusic()
     {
         var musicFile = Path.Join(this.ResourcesDir, "music.yaml");
-        var deserializer = new YamlDotNet.Serialization.Deserializer();
+        var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
+            .WithNamingConvention(UnderscoredNamingConvention.Instance)
+            .IgnoreUnmatchedProperties()
+            .Build();
+
         var gameMusic = deserializer.Deserialize<GameMusic>(File.ReadAllText(musicFile));
         return gameMusic;
     }

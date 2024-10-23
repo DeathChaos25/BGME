@@ -1,6 +1,6 @@
 ﻿namespace PersonaMusicScript.Types.Games;
 
-public class Song
+public class AudioTrack
 {
     public string Name { get; set; } = string.Empty;
 
@@ -10,7 +10,7 @@ public class Song
 
     public int CueId { get; set; }
 
-    public string? ReplacementPath { get; set; }
+    public string? OutputPath { get; set; }
 
     public string? Encoder { get; set; }
 }
