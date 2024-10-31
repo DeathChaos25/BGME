@@ -29,7 +29,7 @@ internal unsafe class BgmService : BaseBgm
 
         ScanHooks.Add(
             nameof(PlayBgmCue),
-            "48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC 30 80 7C 24 ?? 00",
+            "48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC 30 80 7C 24 ?? 00 44 89 C7",
             (hooks, result) => this.playBgmHook = hooks.CreateHook<PlayBgmCue>(this.PlayBgmCueImpl, result).Activate());
 
         ScanHooks.Add(
