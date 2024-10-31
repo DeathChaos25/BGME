@@ -24,13 +24,11 @@ internal unsafe class BgmService : BaseBgm
     private IHook<SetPlayerVolumeCategory>? setPlayerVolumeCategoryHook;
 
     private readonly ICriAtomRegistry criAtomRegistry;
-    private readonly HookContainer<criAtomConfig_GetCategoryIndexById> getCategoryInfoByIndex;
 
     public BgmService(ISharedScans scans, ICriAtomRegistry criAtomRegistry, MusicService music)
         : base(music)
     {
         this.criAtomRegistry = criAtomRegistry;
-        this.getCategoryInfoByIndex = scans.CreateHook<criAtomConfig_GetCategoryIndexById>(this.GetCategoryIndexById, Mod.NAME);
 
         ScanHooks.Add(
             nameof(PlaySound),
@@ -85,16 +83,5 @@ internal unsafe class BgmService : BaseBgm
         // Still required for some audio/players, strangely enough.
         // For example, door opening SFX is muted without it.
         this.setPlayerVolumeCategoryHook!.OriginalFunction(playerHn, param2, cueId);
-    }
-
-    private ushort GetCategoryIndexById(uint id)
-    {
-        // Redirect problematic cues to more limited category.
-        if (id == 5 || id == 3 || id == 4 || id == 8)
-        {
-            return this.getCategoryInfoByIndex.Hook!.OriginalFunction(0);
-        }
-
-        return this.getCategoryInfoByIndex.Hook!.OriginalFunction(id);
     }
 }
