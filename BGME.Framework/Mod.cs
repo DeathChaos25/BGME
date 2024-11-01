@@ -94,8 +94,7 @@ public class Mod : ModBase
                 this.bgme = new Metaphor.BgmeService(this.music);
                 break;
             case Game.P5R_PC:
-                this.modLoader.GetController<IP5RLib>().TryGetTarget(out var p5rLib);
-                this.bgme = new P5R.BgmeService(p5rLib!, this.music);
+                this.bgme = new P5R.BgmeService(this.music);
                 break;
             default:
                 throw new Exception($"Missing BGME service for game {game}.");
