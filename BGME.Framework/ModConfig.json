@@ -44,6 +44,24 @@
             "AssetFileName": "reloaded.sharedlib.hooks.zip"
           },
           "ReleaseMetadataName": "Sewer56.Update.ReleaseMetadata.json"
+        },
+        "Ryo.Reloaded": {
+          "Config": {
+            "UserName": "RyoTune",
+            "RepositoryName": "Ryo",
+            "UseReleaseTag": false,
+            "AssetFileName": "Mod.zip"
+          },
+          "ReleaseMetadataName": "Ryo.Reloaded.ReleaseMetadata.json"
+        },
+        "SharedScans.Reloaded": {
+          "Config": {
+            "UserName": "RyoTune",
+            "RepositoryName": "SharedScans",
+            "UseReleaseTag": false,
+            "AssetFileName": "Mod.zip"
+          },
+          "ReleaseMetadataName": "SharedScans.Reloaded.ReleaseMetadata.json"
         }
       }
     },
@@ -59,20 +77,6 @@
             "ItemId": 477399
           },
           "ReleaseMetadataName": "BGME.Framework.API.ReleaseMetadata.json"
-        },
-        "Ryo.Reloaded": {
-          "Config": {
-            "ItemType": "Mod",
-            "ItemId": 495507
-          },
-          "ReleaseMetadataName": "Ryo.Reloaded.ReleaseMetadata.json"
-        },
-        "SharedScans.Reloaded": {
-          "Config": {
-            "ItemType": "Mod",
-            "ItemId": 495507
-          },
-          "ReleaseMetadataName": "SharedScans.Reloaded.ReleaseMetadata.json"
         }
       }
     }
