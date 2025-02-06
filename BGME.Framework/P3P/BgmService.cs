@@ -146,7 +146,7 @@ internal unsafe class BgmService : BaseBgm
         else
         {
             this.sfxFilePath = null;
-            if (Enum.IsDefined(seType))
+            if (Enum.IsDefined(seType) == false)
             {
                 Log.Debug($"Unknown SE value: {seType}");
             }
