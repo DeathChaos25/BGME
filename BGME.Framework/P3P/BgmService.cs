@@ -1,11 +1,14 @@
 ﻿using BGME.Framework.Music;
+using PersonaMusicScript.Types.Music;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Hooks.Definitions.Enums;
 using Reloaded.Hooks.Definitions.X64;
 using Ryo.Definitions.Structs;
 using Ryo.Interfaces;
+using SharpCompress.Common;
 using System.Runtime.InteropServices;
 using System.Text;
+using YamlDotNet.Core.Tokens;
 using static Reloaded.Hooks.Definitions.X64.FunctionAttribute;
 
 namespace BGME.Framework.P3P;
@@ -25,6 +28,24 @@ internal unsafe class BgmService : BaseBgm
 
     private delegate void PlayComseOrBse(SE_TYPE seType, int param2, ushort majorId, short minorId);
     private IHook<PlayComseOrBse>? playComseOrBseHook;
+
+    private delegate void criAtomExPlayer_SetVolume(nint player, float volume);
+    private IHook<criAtomExPlayer_SetVolume>? criAtomExPlayer_SetVolumeHook;
+    private float sfxVolume;
+
+    private string? sfxFilePath;
+
+    private delegate void PlaySePCM(int soundId);
+    private IHook<PlaySePCM>? PlaySePCMHook;
+
+    private delegate int FUN_1587a9410(short param_1, int param_2, nint* param_3);
+    private IHook<FUN_1587a9410>? _FUN_1587a9410Hook;
+    private int FUN_1587a9410Impl(short param_1, int param_2, nint* param_3)
+    {
+        //Log.Debug($"FUN_1587a9410 param_1, param_2: {param_1}, {param_2}");
+        this.sfxFilePath = null;
+        return _FUN_1587a9410Hook!.OriginalFunction(param_1, param_2, param_3);
+    }
 
     private readonly IRyoApi ryo;
     private readonly ICriAtomEx criAtomEx;
@@ -69,6 +90,21 @@ internal unsafe class BgmService : BaseBgm
             nameof(PlayComseOrBse),
             "40 53 55 56 57 41 54 41 57 48 81 EC B8 00 00 00",
             (hooks, result) => this.playComseOrBseHook = hooks.CreateHook<PlayComseOrBse>(this.PlayComseOrBseImpl, result).Activate());
+
+        ScanHooks.Add(
+            nameof(criAtomExPlayer_SetVolume),
+            "48 85 C9 75 ?? 44 8D 41 ?? 48 8D 15 ?? ?? ?? ?? E9 ?? ?? ?? ?? 48 8B 89 ?? ?? ?? ?? 0F 28 D1 33 D2",
+            (hooks, result) => this.criAtomExPlayer_SetVolumeHook = hooks.CreateHook<criAtomExPlayer_SetVolume>(this.criAtomExPlayer_SetVolumeImpl, result).Activate());
+
+        ScanHooks.Add(
+            nameof(PlaySePCM),
+            "48 89 5C 24 ?? 57 48 83 EC 30 48 63 D9 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? FF 15 ?? ?? ?? ?? 8B D0 4C 8D 05 ?? ?? ?? ?? 48 8D 0D ?? ?? ?? ?? E8 ?? ?? ?? ?? 8B 0D ?? ?? ?? ?? 48 8D 3D ?? ?? ?? ?? 48 C1 E3 05 41 B9 01 00 00 00 C7 44 24 ?? 44 AC 00 00",
+            (hooks, result) => this.PlaySePCMHook = hooks.CreateHook<PlaySePCM>(this.PlaySePCMImpl, result).Activate());
+
+        ScanHooks.Add(
+            nameof(FUN_1587a9410),
+            "48 89 5C 24 ?? 48 89 6C 24 ?? 48 89 74 24 ?? 66 89 4C 24",
+            (hooks, result) => this._FUN_1587a9410Hook = hooks.CreateHook<FUN_1587a9410>(this.FUN_1587a9410Impl, result).Activate());
     }
 
     private nint _customSePlayer = IntPtr.Zero;
@@ -82,6 +118,7 @@ internal unsafe class BgmService : BaseBgm
                 var config = (CriAtomExPlayerConfigTag*)Marshal.AllocHGlobal(Marshal.SizeOf<CriAtomExPlayerConfigTag>());
                 config->maxPathStrings = 8;
                 config->maxPath = 256;
+                config->voiceAllocationMethod = 1;
 
                 this._customSePlayer = this.criAtomEx.Player_Create(config, (void*)0, 0);
             }
@@ -99,25 +136,56 @@ internal unsafe class BgmService : BaseBgm
     /// <param name="minorId">Last two digits of file.</param>
     private void PlayComseOrBseImpl(SE_TYPE seType, int param2, ushort majorId, short minorId)
     {
-        if (Enum.IsDefined(seType))
+        //Log.Debug($"seType, param2, majorId, minorId: {seType}, {param2}, {majorId}, {minorId}");
+        var seFilePath = $"sound/se/{(seType == SE_TYPE.COMSE ? "comse.pak/" : "bse.pak/b")}{majorId:00}{minorId:00}.vag";
+        if (Enum.IsDefined(seType) && this.ryo.HasFileContainer(seFilePath))
         {
-            var seFilePath = $"sound/se/{(seType == SE_TYPE.COMSE ? "comse.pak/" : "bse.pak/b")}{majorId:00}{minorId:00}.vag";
             Log.Debug($"{nameof(PlayComseOrBse)}: {seFilePath}");
-            if (this.ryo.HasFileContainer(seFilePath))
-            {
-                //var playerHn = this.criAtomRegistry.GetPlayerById(0)!.Handle;
-                this.criAtomEx.Player_SetFile(this.CustomeSePlayer, 0, (byte*)StringsCache.GetStringPtr(seFilePath));
-                this.criAtomEx.Player_Start(this.CustomeSePlayer);
-            }
-            else
-            {
-                this.playComseOrBseHook!.OriginalFunction(seType, param2, majorId, minorId);
-            }
+            this.sfxFilePath = seFilePath;
         }
         else
         {
-            Log.Debug($"Unknown SE value: {seType}");
-            this.playComseOrBseHook!.OriginalFunction(seType, param2, majorId, minorId);
+            this.sfxFilePath = null;
+            if (Enum.IsDefined(seType) == false)
+            {
+                Log.Debug($"Unknown SE value: {seType}");
+            }
+        }
+        this.playComseOrBseHook!.OriginalFunction(seType, param2, majorId, minorId);
+    }
+
+    /// <summary>
+    /// Control playback volume for COMSE or BSE SFX.
+    /// </summary>
+    /// <param name="player">Player used to play the sound category. 0 = SE, 1 = Music, 2 = Voice</param>
+    /// <param name="volume">Controls the volume of the sound played</param>
+    private void criAtomExPlayer_SetVolumeImpl(nint player, float volume)
+    {
+        var currentplayer = criAtomRegistry.GetPlayerByHn(player);
+        if (currentplayer!.Id == 0)
+        {
+            this.criAtomExPlayer_SetVolumeImpl(CustomeSePlayer, volume);
+            this.sfxVolume = volume;
+            //Log.Debug($"criAtomExPlayer Player {currentplayer.Id}: {volume}");
+        }
+        this.criAtomExPlayer_SetVolumeHook!.OriginalFunction(player, volume);
+    }
+
+    /// <summary>
+    /// Play PCM SFX.
+    /// </summary>
+    /// <param name="soundId">Sound ID.</param>
+    private void PlaySePCMImpl(int soundId)
+    {
+        //Log.Debug($"PlaySePCM soundId: {soundId}");
+        if (this.sfxFilePath != null)
+        {
+            this.criAtomEx.Player_SetFile(this.CustomeSePlayer, 0, (byte*)StringsCache.GetStringPtr(sfxFilePath));
+            this.criAtomEx.Player_Start(this.CustomeSePlayer);
+        }
+        else
+        {
+            this.PlaySePCMHook!.OriginalFunction(soundId);
         }
     }
 
