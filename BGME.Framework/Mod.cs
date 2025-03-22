@@ -47,7 +47,7 @@ public class Mod : ModBase
         this.config = context.Configuration;
         this.modConfig = context.ModConfig;
 
-        Project.Init(this.modConfig, this.modLoader, this.logger, Color.LightBlue);
+        Project.Initialize(this.modConfig, this.modLoader, this.logger, Color.LightBlue);
         Log.LogLevel = this.config.LogLevel;
 
 #if DEBUG
@@ -101,7 +101,6 @@ public class Mod : ModBase
         }
 
         this.ApplyConfig();
-        Project.Start();
     }
 
     private void OnBgmeModLoading(BgmeMod mod)
