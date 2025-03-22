@@ -7,4 +7,5 @@ public enum Game
     P5R_PC,
     P3R_PC,
     Metaphor,
+    SMT5V,
 }

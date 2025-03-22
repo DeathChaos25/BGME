@@ -34,6 +34,11 @@ public class MusicResources
         {
             TotalEncounters = 2000,
         },
+
+        [Game.SMT5V] = new()
+        {
+            TotalEncounters = 3001,
+        },
     };
 
     private readonly Game game;
@@ -98,6 +103,11 @@ public class MusicResources
     private GameMusic GetGameMusic()
     {
         var musicFile = Path.Join(this.ResourcesDir, "music.yaml");
+        if (!File.Exists(musicFile))
+        {
+            return new();
+        }
+
         var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
             .WithNamingConvention(UnderscoredNamingConvention.Instance)
             .IgnoreUnmatchedProperties()
