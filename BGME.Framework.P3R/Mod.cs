@@ -1,7 +1,6 @@
 ﻿using BGME.Framework.Interfaces;
 using BGME.Framework.Music;
 using BGME.Framework.P3R.Configuration;
-using BGME.Framework.P3R.P3R;
 using BGME.Framework.P3R.Template;
 using PersonaMusicScript.Types;
 using PersonaMusicScript.Types.Games;
@@ -11,6 +10,7 @@ using Reloaded.Mod.Interfaces;
 using Ryo.Interfaces;
 using System.Diagnostics;
 using System.Drawing;
+using Unreal.ObjectsEmitter.Interfaces;
 
 namespace BGME.Framework.P3R;
 
@@ -42,16 +42,21 @@ public class Mod : ModBase
         Debugger.Launch();
 #endif
 
-        Project.Init(this.modConfig, this.modLoader, this.log, Color.LightBlue);
+        Project.Initialize(this.modConfig, this.modLoader, this.log, Color.LightBlue);
         Log.LogLevel = this.config.LogLevel;
 
         this.modLoader.GetController<IBgmeApi>().TryGetTarget(out this.bgmeApi!);
         this.modLoader.GetController<IRyoApi>().TryGetTarget(out this.ryo!);
         this.modLoader.GetController<ICriAtomEx>().TryGetTarget(out var criAtomEx);
+        this.modLoader.GetController<IUnreal>().TryGetTarget(out var unreal);
         this.modLoader.GetController<IStartupScanner>().TryGetTarget(out var scanner);
+        this.modLoader.GetController<IDataTables>().TryGetTarget(out var dt);
 
+        var appId = this.modLoader.GetAppConfig().AppId;
         var modDir = this.modLoader.GetDirectoryForModId(this.modConfig.ModId);
-        var musicResources = new MusicResources(Game.P3R_PC, modDir);
+        var game = GetGame(appId);
+
+        var musicResources = new MusicResources(game, modDir);
         var music = new MusicService(musicResources, this.bgmeApi, null, false);
 
         // Register music from BGME mods.
@@ -61,18 +66,36 @@ public class Mod : ModBase
             this.OnBgmeModLoading(mod);
         }
 
-        this.bgme = new BgmeService(criAtomEx!, music);
+        switch (game)
+        {
+            case Game.P3R_PC:
+                this.bgme = new P3R.BgmeService(criAtomEx!, music);
+                break;
+            case Game.SMT5V:
+                var smt5v = new SMT5V.BgmeService(criAtomEx!, music);
+                this.bgme = smt5v;
+
+                smt5v.SetConfig(this.config);
+                break;
+            default:
+                throw new Exception($"Missing BGME service for game {game}.");
+        }
 
         this.ApplyConfig();
-        Project.Start();
     }
 
     private void OnBgmeModLoading(BgmeMod mod)
     {
-        var bgmeMusicDir = Path.Join(mod.ModDir, "bgme", "p3r");
-        if (Directory.Exists(bgmeMusicDir))
+        var bgmeMusicDirP3R = Path.Join(mod.ModDir, "bgme", "p3r");
+        if (Directory.Exists(bgmeMusicDirP3R))
         {
-            this.ryo.AddAudioPath(bgmeMusicDir, new() { CategoryIds = new int[] { 0, 13 } });
+            this.ryo.AddAudioPath(bgmeMusicDirP3R, new() { CategoryIds = [0, 13] });
+        }
+
+        var bgmeMusicDirSMT5 = Path.Join(mod.ModDir, "bgme", "smt5v");
+        if (Directory.Exists(bgmeMusicDirSMT5))
+        {
+            this.ryo.AddAudioPath(bgmeMusicDirSMT5, new() { AcbName = "BGM", CategoryIds = [0, 4, 9, 40, 11, 35, 50] });
         }
 
         if (mod.ModId == "BGME.DisableVictoryTheme")
@@ -93,6 +116,14 @@ public class Mod : ModBase
         {
             this.bgme.SetVictoryDisabled(false);
         }
+    }
+
+    private static Game GetGame(string appId)
+    {
+        if (appId.Contains("p3r", StringComparison.OrdinalIgnoreCase)) return Game.P3R_PC;
+        if (appId.Contains("smt5v", StringComparison.OrdinalIgnoreCase)) return Game.SMT5V;
+
+        throw new Exception($"Unknown app: {appId}");
     }
 
     #region Standard Overrides

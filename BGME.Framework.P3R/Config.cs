@@ -12,6 +12,11 @@ public class Config : Configurable<Config>
     [DisplayName("Disable Victory Theme")]
     [DefaultValue(false)]
     public bool DisableVictoryBgm { get; set; } = false;
+
+    [Category("SMT5V")]
+    [DisplayName("BGM Volume Fix for Ryo Framework")]
+    [DefaultValue(true)]
+    public bool SMT5V_UseVolumeFix { get; set; } = true;
 }
 
 /// <summary>
